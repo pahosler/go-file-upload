@@ -42,6 +42,8 @@ func uploadRoute(w http.ResponseWriter, r *http.Request) {
 
 	tempFile.Write(byteArray)
 
-	fmt.Fprintf(w, "File has been uploaded")
-	fmt.Fprintf(w, "File has been Line 2")
+	fmt.Fprintf(w, "File has been uploaded\n")
+	fmt.Fprintf(w, "File name: %v\n", handle.Filename)
+	fmt.Fprintf(w, "File size: %v\n", handle.Size)
+	fmt.Fprintf(w, "File type: %v\n", handle.Header)
 }
