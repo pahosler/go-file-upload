@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -16,5 +17,31 @@ func main() {
 }
 
 func uploadRoute(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello world")
+	r.ParseMultipartForm(10 << 20)
+
+	file, handle, err := r.FormFile("file")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(handle.Filename)
+
+	defer file.Close()
+
+	tempFile, err := ioutil.TempFile("upload", handle.Filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer tempFile.Close()
+
+	byteArray, err := ioutil.ReadAll(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	tempFile.Write(byteArray)
+
+	fmt.Fprintf(w, "File has been uploaded")
+	fmt.Fprintf(w, "File has been Line 2")
 }
