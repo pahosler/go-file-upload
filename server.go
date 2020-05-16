@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 func main() {
@@ -24,11 +25,12 @@ func uploadRoute(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	fmt.Println(handle.Filename)
-
 	defer file.Close()
 
-	tempFile, err := ioutil.TempFile("upload", handle.Filename)
+	timestamp := time.Now().Unix()
+	asString := fmt.Sprintf("%v", timestamp)
+
+	tempFile, err := ioutil.TempFile("upload", asString+"_"+handle.Filename)
 	if err != nil {
 		log.Fatal(err)
 	}
