@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -30,22 +31,17 @@ func uploadRoute(w http.ResponseWriter, r *http.Request) {
 	timestamp := time.Now().Unix()
 	asString := fmt.Sprintf("%v", timestamp)
 
-	tempFile, err := ioutil.TempFile("upload", asString+"_"+handle.Filename)
+	f, err := os.OpenFile("upload/"+asString+"_"+handle.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	defer tempFile.Close()
+	defer f.Close()
 
-	byteArray, err := ioutil.ReadAll(file)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	tempFile.Write(byteArray)
+	io.Copy(f, file)
 
 	fmt.Fprintf(w, "File has been uploaded\n")
 	fmt.Fprintf(w, "File name: %v\n", handle.Filename)
 	fmt.Fprintf(w, "File size: %v\n", handle.Size)
-	fmt.Fprintf(w, "File type: %v\n", handle.Header)
+	fmt.Fprintf(w, "File type: %v\n", handle.Header["Content-Type"])
 }
